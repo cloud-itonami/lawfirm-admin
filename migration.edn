@@ -1,0 +1,4 @@
+{:schema "etzhayyim.migration/v1"
+ :source {:repository "etzhayyim/root" :revision "6fd297f38fe1b547e1d4c15ead9941c6ebaa3b31" :path "60-apps/etzhayyim-project-lawfirm-admin" :tree "a7415a138dd03fddabd4bf102168f89ba112c0ec" :tracked-files 16 :bytes 73133}
+ :destination {:repository "etzhayyim/com-etzhayyim-app-lawfirm-admin"}
+ :identity {:allowed-additions ["README.edn" "migration.edn"]}}

@@ -1,0 +1,11 @@
+{
+  "name": "lawfirm-admin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "lawfirm-admin — Legal Administration Platform (appview UI: shadow-cljs + reagent + kotoba-ui)",
+  "type": "module",
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}

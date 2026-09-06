@@ -1,0 +1,93 @@
+(ns lawfirm-admin.app
+  "lawfirm-admin-mcp-component appview — reagent + re-frame, view built from
+  jp-go-dds (デジタル庁デザインシステム) hiccup.
+
+  This is a faithful port of the former SvelteKit scaffold
+  (`svelte/src/routes/+page.svelte`): a single static screen describing the
+  app surface (title / project / route count / XRPC flag / declared public
+  routes / declared runtime bindings / source path), backed by a hardcoded
+  object with empty `routes` and `vars` arrays. It does not add case/client
+  management even though `wrangler.jsonc` declares those capabilities
+  (`createCase`, `listClients`, ...) — that business logic was never in this
+  scaffold and this migration does not invent it.
+
+  The data is kept in the re-frame db and read through subs so the migration
+  actually exercises reagent + re-frame plumbing (the workspace standard),
+  even though the original Svelte page had no interactivity at all."
+  (:require [reagent.dom :as rdom]
+            [re-frame.core :as rf]
+            [jp-go-dds.core :as dds]))
+
+;; -- db --------------------------------------------------------------------
+;;
+;; 1:1 with the object literal at the top of the former +page.svelte:
+;;
+;;   const app = {
+;;     title: "Lawfirm Admin Mcp Component",
+;;     project: "etzhayyim-project-lawfirm-admin",
+;;     name: "lawfirm-admin-mcp-component",
+;;     kind: "appview",
+;;     routeCount: 0,
+;;     routes: [],
+;;     vars: [],
+;;     xrpc: true,
+;;     relativePath: "60-apps/etzhayyim-project-lawfirm-admin/appview/lawfirm-admin-mcp-component/svelte/src/routes/+page.svelte"
+;;   };
+
+(def default-db
+  {:app {:title "Lawfirm Admin Mcp Component"
+         :project "etzhayyim-project-lawfirm-admin"
+         :name "lawfirm-admin-mcp-component"
+         :kind "appview"
+         :route-count 0
+         :routes []
+         :vars []
+         :xrpc? true
+         :relative-path "appview/lawfirm-admin-mcp-component/cljs/src/lawfirm_admin/app.cljs"}})
+
+(rf/reg-event-db
+ :initialize-db
+ (fn [_ _] default-db))
+
+(rf/reg-sub :app (fn [db _] (:app db)))
+
+;; -- view --------------------------------------------------------------------
+
+(defn- facts [{:keys [project route-count xrpc?]}]
+  (dds/table
+   {:headers ["Project" "Routes" "XRPC"]
+    :rows [[project route-count (if xrpc? "enabled" "not configured")]]}))
+
+(defn- public-routes [{:keys [routes]}]
+  (dds/section {:title "Public Routes"}
+    (if (seq routes)
+      (dds/table {:headers ["Route"] :rows (mapv vector routes)})
+      [:p {:class "dds-ext-lead"} "No public route is declared next to this app surface."])))
+
+(defn- runtime-bindings [{:keys [vars]}]
+  (dds/section {:title "Runtime Bindings"}
+    (if (seq vars)
+      (dds/row (for [v vars] ^{:key v} [dds/chip-label v]))
+      [:p {:class "dds-ext-lead"} "No public vars are declared in the nearest wrangler config."])))
+
+(defn- source [{:keys [relative-path]}]
+  (dds/section {:title "Source"}
+    [:p relative-path]))
+
+(defn app-view []
+  (let [{:keys [kind title name] :as app} @(rf/subscribe [:app])]
+    (dds/container
+     (dds/section {}
+       [:p {:class "dds-ext-lead"} (str "Cloudflare " kind)]
+       (dds/heading 1 title)
+       [:p name])
+     (facts app)
+     (public-routes app)
+     (runtime-bindings app)
+     (source app))))
+
+;; -- init --------------------------------------------------------------------
+
+(defn ^:export main []
+  (rf/dispatch-sync [:initialize-db])
+  (rdom/render [app-view] (js/document.getElementById "app")))

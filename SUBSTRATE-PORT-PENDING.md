@@ -1,6 +1,10 @@
 # SUBSTRATE-PORT-PENDING — etzhayyim-project-lawfirm-admin
 
-**Status**: 🟡 **PARTIAL — 2026-05-24** (`src/app.ts` ported; Svelte adapter + package rename still deferred to ADR-2605214000).
+**Status**: 🟡 **PARTIAL — 2026-05-24** (`src/app.ts` ported; package rename still deferred to ADR-2605214000).
+**2026-09-07 note**: the Svelte adapter mentioned below no longer exists — the frontend was
+retired and rebuilt as `cljs/` (reagent + re-frame + jp-go-dds); see `README.md`. The one
+piece of Svelte-tree code that carried live substrate-port history (item 2 below) was
+relocated, not deleted — see its new path.
 
 ## Background
 
@@ -14,7 +18,7 @@
 ## Substrate violations remaining (ADR-2605172000 / 2605172100 boundary)
 
 1. ~~`src/app.ts` — DID / NSID / dispatcher URL rename.~~ **DONE 2026-05-24.**
-2. `svelte/src/routes/xrpc/[...path]/+server.ts` — forwards to `mcp.etzhayyim.com/xrpc/com.etzhayyim.mcp.message` → re-target to `mcp.etzhayyim.com` (same pattern as gov-mcp-component port).
+2. `src/xrpc-mcp-router-proxy.ts` (formerly `svelte/src/routes/xrpc/[...path]/+server.ts`, relocated 2026-09-07 when the SvelteKit frontend was retired for cljs — see README.md; preserved as-is, not wired into the deployed Worker) — forwards to `mcp.etzhayyim.com/xrpc/com.etzhayyim.mcp.message` → re-target to `mcp.etzhayyim.com` (same pattern as gov-mcp-component port).
 3. ~~Kysely / HyperDrive references.~~ **N/A — never present in this app.**
 4. ~~Lexicon namespace rename.~~ **DONE 2026-05-24** (NSID_PREFIX cutover in `src/app.ts`).
 5. Package name `@etzhayyim/kotodama-*` → `@etzhayyim/kotodama-*` (ADR-2605214000 atomic cutover — still pending).

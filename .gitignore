@@ -1,8 +1,7 @@
-# docs/operator-quickstart.md の手順が生成するもの。
-# この repo に build 成果物は入れない（wrangler.jsonc の assets が指す
-# appview/.../web/dist も生成物であって、追跡対象ではない）。
+# This repo does not track build output. The frontend build lives in
+# appview/lawfirm-admin-mcp-component/cljs/ (wrangler.jsonc's `assets.directory`
+# points at cljs/public, which cljs/.gitignore keeps generated JS out of).
 node_modules/
-package-lock.json
-.svelte-kit/
+/package-lock.json
 .shadow-cljs/
 .cpcache/

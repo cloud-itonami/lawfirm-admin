@@ -10,6 +10,24 @@
 という 1 点を先に読んでおくこと —— 読まずにこの手順を踏むと `/health` が 404 で
 返ってきた時点で「壊れている」と誤診する（壊れていない。実装が別の場所にある）。
 
+> ⚠ **2026-09-07 追記 — 上記の前提はもう成り立たない。** `svelte/` は撤去され、
+> `wrangler.jsonc` の `main` は `src/app.ts` を指すようになった（`../README.md` の
+> 「デプロイされるのはどれか」節参照）。つまり **`src/app.ts` はもう配られていない
+> ものではなく、配られる実体そのもの**である。この文書の §3（SvelteKit のビルド
+> 手順）・§4（`AGENTGATEWAY_MCP_ROUTER_URL` を使った旧 `+server.ts` の動作確認）・
+> §6 の `svelte/ 側の npm run check` は、すべて撤去済みの `svelte/` を前提にしており
+> **もう踏めない**。以下は当時の実測として残すが、現行の `src/app.ts` エントリに
+> 対する踏み直しは行っていない（このリポジトリの UI 移行タスクはフロントエンドの
+> 置き換えが範囲で、`wrangler dev` を新たに走らせての再検証は含まない）。
+> UI（`cljs/`）だけを見たいなら:
+>
+> ```bash
+> cd appview/lawfirm-admin-mcp-component/cljs
+> npm install
+> npx shadow-cljs release app   # public/js/ に出力。public/index.html と合わせて静的に開ける
+> npx shadow-cljs compile test && node out/tests.js
+> ```
+
 ---
 
 ## 1. 取得
@@ -45,9 +63,12 @@ added 65 packages, and audited 66 packages in 489ms
 
 **この緑を健全性の根拠にしない。** 通っているのは
 `test/lawfirm-admin.test.ts` の `expect(true).toBe(true)` 1 本だけで、
-`+server.ts` も `src/app.ts` も 1 行も実行していない（README 既知の欠陥 4）。
+`src/xrpc-mcp-router-proxy.ts`（配線されていない）も `src/app.ts` も 1 行も
+実行していない（README 既知の欠陥 4）。
 
 ## 3. デプロイされる成果物を作る
+
+> ⚠ **STALE（2026-09-07）**: この節は撤去済みの `svelte/` を前提にしている。冒頭の追記を参照。
 
 `wrangler.jsonc` の `main` は `svelte/.svelte-kit/cloudflare/_worker.js` を指すが、
 これは生成物で commit されていない。**先に SvelteKit を build しないと
@@ -82,6 +103,8 @@ ls   svelte/.svelte-kit/cloudflare/client
 > `node <superproject>/scripts/resource-guard.mjs run build -- npm run build`
 
 ## 4. ローカルで実物を叩く
+
+> ⚠ **STALE（2026-09-07）**: この節は撤去済みの `svelte/` を前提にしている。冒頭の追記を参照。
 
 **production の MCP router に触らずに**振る舞いを見る。まず echo を 1 本立てる
 （`nbb` を使う。この workspace は運用スクリプトに `.sh` / `.mjs` を新規に置かない）:
@@ -156,6 +179,8 @@ access-control-max-age: 86400
 
 ## 5. edge が nsid を検査しないことを自分で確かめる
 
+> ⚠ **STALE（2026-09-07）**: この節は撤去済みの `svelte/` を前提にしている。冒頭の追記を参照。
+
 README の既知の欠陥 2 は、この 1 コマンドで再現する:
 
 ```bash
@@ -197,15 +222,16 @@ npm run typecheck        # exit 1
 
 `tsc --noEmit` を呼ぶが `appview/lawfirm-admin-mcp-component/tsconfig.json` が
 存在しないので、tsc は入力を見つけられず**ヘルプを出力して** exit 1 する。
-型エラーではない。型を見たいなら:
+型エラーではない。型を見たいなら（**2026-09-07 時点で撤去済み。もう使えない**）:
 
 ```bash
-cd svelte && npm run check      # svelte-kit sync && svelte-check
+cd svelte && npm run check      # svelte-kit sync && svelte-check（svelte/ は無い）
 ```
 
 `tsconfig.json` を足せば黙らせられるが、**それは直したことにならない** ——
-検査対象になるのが配られない `src/app.ts` だからで、先に決めるべきは
-その処遇である（README 既知の欠陥 1・3）。
+2026-09-07 現在 `src/app.ts` は `main` そのもの（配られている）なので、型検査の
+対象にする価値はむしろ上がっている。tsconfig を足すこと自体は今回のタスク
+（UI 移行）の範囲外として見送った（README 既知の欠陥 3）。
 
 ## 7. デプロイ
 
@@ -214,7 +240,9 @@ cd svelte && npm run check      # svelte-kit sync && svelte-check
 1. `git fetch origin && git merge --ff-only origin/main`
    （PreToolUse hook `wrangler-deploy-main-sync-guard.cljs` が遅れた checkout からの
    `wrangler deploy` を deny する。`--env <name>` と `--dry-run` は対象外）
-2. §2 と §3 を通す（**build を飛ばすと `main` の指す先が無い**）
+2. §2 を通す。UI（`cljs/`）を変更したなら
+   `cd appview/lawfirm-admin-mcp-component/cljs && npm install && npx shadow-cljs release app`
+   で `public/js/` を再生成する（§3 は撤去済みの `svelte/` 前提なので使わない）
 3. `wrangler deploy`
 
 deploy 先は `wrangler.jsonc` の `routes` —— `lawfirm-admin.etzhayyim.com/*` と

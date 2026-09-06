@@ -10,7 +10,7 @@
     "APP_CAPABILITIES": "[\"createCase\",\"updateCase\",\"listCases\",\"getCase\",\"createClient\",\"updateClient\",\"listClients\",\"getClient\"]",
     "APP_DESCRIPTION": "lawfirm-admin — Legal Administration Platform. Case and client management with BPMN-driven workflows.",
     "APP_DISPLAY_NAME": "Law Firm Admin",
-    "APP_FRAMEWORK": "sveltekit-edge-bff",
+    "APP_FRAMEWORK": "cljs-reagent-re-frame-jp-go-dds",
     "APP_NANOID": "ujv6oh9s",
     "APP_PERFORMER_TYPE": "service",
     "APP_UI_TYPE": "yoro",
@@ -35,7 +35,7 @@
     }
   ],
   "assets": {
-    "directory": "../../web/dist",
+    "directory": "./cljs/public",
     "binding": "ASSETS",
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "none"

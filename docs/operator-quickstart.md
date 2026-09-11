@@ -24,8 +24,8 @@
 > ```bash
 > cd appview/lawfirm-admin-mcp-component/cljs
 > npm install
-> npx shadow-cljs release app   # public/js/ に出力。public/index.html と合わせて静的に開ける
-> npx shadow-cljs compile test && node out/tests.js
+> amu compile --target wasm32-browser app   # public/js/ に出力。public/index.html と合わせて静的に開ける
+> amu compile --target wasm32-browser test && node out/tests.js
 > ```
 
 ---
@@ -125,7 +125,7 @@ ls   svelte/.svelte-kit/cloudflare/client
 ```
 
 ```bash
-nbb /tmp/echo-probe.cljs &
+kbb --backend sci /tmp/echo-probe.cljk &
 ```
 
 router を echo に向けて worker を起動する（`--var` が `wrangler.jsonc` の
@@ -241,7 +241,7 @@ cd svelte && npm run check      # svelte-kit sync && svelte-check（svelte/ は�
    （PreToolUse hook `wrangler-deploy-main-sync-guard.cljs` が遅れた checkout からの
    `wrangler deploy` を deny する。`--env <name>` と `--dry-run` は対象外）
 2. §2 を通す。UI（`cljs/`）を変更したなら
-   `cd appview/lawfirm-admin-mcp-component/cljs && npm install && npx shadow-cljs release app`
+   `cd appview/lawfirm-admin-mcp-component/cljs && npm install && amu compile --target wasm32-browser app`
    で `public/js/` を再生成する（§3 は撤去済みの `svelte/` 前提なので使わない）
 3. `wrangler deploy`
 

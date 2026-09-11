@@ -43,7 +43,7 @@
          :routes []
          :vars []
          :xrpc? true
-         :relative-path "appview/lawfirm-admin-mcp-component/cljs/src/lawfirm_admin/app.cljs"}})
+         :relative-path "appview/lawfirm-admin-mcp-component/cljs/src/lawfirm_admin/app.cljk"}})
 
 (rf/reg-event-db
  :initialize-db
